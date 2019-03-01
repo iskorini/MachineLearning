@@ -1,23 +1,29 @@
-from python_speech_features import mfcc
-import scipy.io.wavfile as wav
 import numpy as np
 import glob
+import speechpy as sphp
+import scipy.io.wavfile as wav
+from sys import exit
+from pathlib import Path
+import pandas as pd
+
+def extract_feature_from_wav(path):
+    (rate, sig) = wav.read(path)
+    mfcc_feat = sphp.feature.mfcc(sig, sampling_frequency=16000, frame_length=0.025,
+                              frame_stride=0.01, num_filters=26, num_cepstral=12)
+    log_energy = sphp.feature.lmfe(sig, sampling_frequency=16000, frame_length=0.025,
+                               frame_stride=0.01, num_filters=26)
+    feature = np.append(mfcc_feat, np.sum(log_energy, axis=1).
+                        reshape(log_energy.shape[0], 1), axis=1)
+    return np.reshape(sphp.feature.extract_derivative_feature(feature)[:, :, 0:2], (log_energy.shape[0], 26))
 
 
-for filename in glob.iglob('./timit/**/**/**/*CONVERTED.wav'):
-    (rate, sig) = wav.read(filename)
-    mfcc_feat = mfcc(sig, rate, winstep=0.01, winlen=0.025, appendEnergy=True, samplerate=16000)
-    np.savetxt(filename.replace('CONVERTED.wav', '-feature.txt'), mfcc_feat)
+for file_name in glob.iglob('./timit/**/**/**/*CONVERTED.wav'):
+    feature = extract_feature_from_wav(file_name)
+    feature_name = file_name.replace('timit', 'preprocessed_dataset')
+    feature_name = feature_name.replace('wav', 'csv')
+    feature_name = feature_name.replace('CONVERTED', '')
+    Path(feature_name[:''.join(feature_name).rindex('/')]).mkdir(parents=True, exist_ok=True)
+    print(file_name, " -> ", feature_name)
+    pd.DataFrame(feature).to_csv(feature_name)
 
-#import speechpy as sphp
-#import scipy.io.wavfile as wav
-#import matplotlib.pyplot as plt
-
-#(rate, sig) = wav.read('./timit/test/dr1/faks0/sa1CONVERTED.wav')
-#mfcc_feat = sphp.feature.mfcc(sig, sampling_frequency=16000, frame_length=0.025 , frame_stride=0.01)
-#derivative_mfcc_feat = sphp.feature.extract_derivative_feature(mfcc_feat)
-#plt.figure()
-#plt.plot(mfcc_feat)
-#plt.show()
-#plt.figure()
-
+exit(0)
