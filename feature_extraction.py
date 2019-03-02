@@ -43,7 +43,7 @@ def create_file_of_feature(path):
         file.close()
         phoneme = np.array([[e for e in line.split(' ')] for line in phoneme.splitlines()])
         phoneme[:, 0:2] = (phoneme[:, 0:2].astype(int)) // 16  # convert to ms (sampling rate 16KHz)
-        feature['phoneme'] = ''
+        feature['phoneme'] = 'h#'
         for row in phoneme:
             feature.loc[feature['start_frame'] > int(row[0]), 'phoneme'] = row[2]
         feature.to_csv(feature_name)
