@@ -119,20 +119,22 @@ def GRU_model():
     model.add(layers.GRU(32, input_shape=(None, float_data.shape[-1])))
     model.add(layers.Dense(1))
     model.compile(optimizer=RMSprop(), loss='mae')
-    history = model.fit_generator(train_gen, steps_per_epoch=500, epochs=20,
-                                  validation_data=val_gen,
-                                  validation_steps=val_steps)
-    loss = history.history['loss']
-    val_loss = history.history['val_loss']
-    epochs = range(1, len(loss)+1)
-    plt.figure()
-    plt.plot(epochs, loss, 'bo', label = 'training loss')
-    plt.plot(epochs, val_loss, 'b', label='validation loss')
-    plt.title("training and validation loss")
-    plt.legend()
-    plt.show()
+    #history = model.fit_generator(train_gen, steps_per_epoch=500, epochs=20,
+    #                              validation_data=val_gen,
+    #                              validation_steps=val_steps)
+    #loss = history.history['loss']
+    #val_loss = history.history['val_loss']
+    #epochs = range(1, len(loss)+1)
+    ##plt.figure()
+    #plt.plot(epochs, loss, 'bo', label = 'training loss')
+    #plt.plot(epochs, val_loss, 'b', label='validation loss')
+    #plt.title("training and validation loss")
+    #plt.legend()
+    #plt.show()
 
+
+next(val_gen)
 #print(evaluate_naive_method())
 #simple_model()
 GRU_model()
-exit(0)
+#exit(0)
