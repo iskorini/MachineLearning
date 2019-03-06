@@ -47,5 +47,5 @@ def create_file_of_feature(path):
         feature.to_csv(feature_name)
 
 if __name__ == '__main__':
-    create_file_of_feature('./timit/**/dr1/**/**CONVERTED.wav')
+    create_file_of_feature('./timit/**/**/**/**CONVERTED.wav')
     exit(0)
