@@ -14,17 +14,17 @@ from DataGenerator import MyDataGenerator
 def SimpleModel():
     model = models.Sequential()
     model.add(
-        layers.Dense(120 ,input_shape=(120,))
+        layers.Dense(120 ,input_shape=(120,), activation='relu')
     )
     model.add(
-        layers.Dense(120)
+        layers.Dense(120, activation='relu')
     )
     model.add(
-        layers.Dense(3)
+        layers.Dense(3, activation='sigmoid')
     )
     model.compile(
-        loss='binary_crossentropy',
-        optimizer='rmsprop',
+        loss='categorical_crossentropy',
+        optimizer='adam',
         metrics=['acc']
     )
     return model
