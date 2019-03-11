@@ -22,7 +22,7 @@ def extract_feature_from_wav(path):
 def create_file_of_feature(path):
     for file_name in glob.iglob(path):
 
-        feature_name = file_name.replace('timit', 'preprocessed_dataset_LMFE')
+        feature_name = file_name.replace('timit', 'preprocessed_dataset_LMFE_CNN')
         feature_name = feature_name.replace('.wav', '.csv')
         feature_name = feature_name.replace('CONVERTED', '')
         Path(feature_name[:''.join(feature_name).rindex('/')]).mkdir(parents=True, exist_ok=True)
@@ -48,9 +48,6 @@ def create_file_of_feature(path):
 
 
 if __name__ == '__main__':
-    create_file_of_feature('./timit/**/dr1/**/**CONVERTED.wav')
-    create_file_of_feature('./timit/**/dr2/**/**CONVERTED.wav')
-    create_file_of_feature('./timit/**/dr3/**/**CONVERTED.wav')
-    create_file_of_feature('./timit/**/dr4/**/**CONVERTED.wav')
-    create_file_of_feature('./timit/**/dr5/**/**CONVERTED.wav')
+
+    create_file_of_feature('./timit/**/**/**/**CONVERTED.wav')
     exit(0)

@@ -12,24 +12,50 @@ from DataGenerator import MyDataGenerator
 
 def CNN_SPR():
     model = models.Sequential()
+    model.add(
+        layers.Conv2D(150, kernel_size=3, activation='relu', input_shape=(3, 465, 40))
+    )
+    model.add(
+        layers.MaxPool2D(pool_size=2, data_format='channels_first')
+    )
+    model.add(layers.Flatten())
+    model.add(
+        layers.Dense(3, activation='softmax')
+    )
+    model.compile(
+        loss='binary_crossentropy',
+        optimizer='rmsprop',
+        metrics=['acc']
+    )
     return model
 
+def plot_value(epochs, history):
+    plt.figure()
+    plt.plot(range(0, epochs), history.history['val_loss'], 'r', label = "val loss")
+    plt.plot(range(0, epochs), history.history['val_acc'], 'b', label="val acc")
+    plt.legend()
+    plt.show()
+
+
+def encode_label(label):
+    encoder = LabelEncoder()
+    encoder.fit(label.astype(str))
+    train_encoded_labels = encoder.transform(label)
+    return to_categorical(train_encoded_labels)
 
 if __name__ == '__main__':
 
-    d = MyDataGenerator('./preprocessed_dataset/train/dr1/**/**.csv')
-    train_data, train_label = d.generate_data()
+    d_train = MyDataGenerator('./preprocessed_dataset/train/**/*/**.csv')
+    d_test = MyDataGenerator('./preprocessed_dataset/test/**/*/**.csv')
+    train_data, train_label = d_train.generate_data(phoneme_list=['p', 't', 'k'], max_phn=465)
+    test_data, test_label = d_test.generate_data(phoneme_list=['p', 't', 'k'], max_phn=465)
+    train_label = encode_label(train_label)
+    test_label = encode_label(test_label)
 
-    encoder = LabelEncoder()
-    encoder.fit(train_label.astype(str))
-    train_encoded_labels = encoder.transform(train_label)
-    train_label = to_categorical(train_encoded_labels)
+    model = CNN_SPR()
+    print(model.summary())
+    history = model.fit(train_data, train_label,
+                        epochs=20, batch_size=128, validation_split=0.2)
+    print(model.evaluate(test_data, test_label))
 
-    #train_data -= train_data.mean(axis=1)
-    #train_data /= train_data.std(axis=1)
-
-    #model = CNN_SPR()
-    #print(model.summary())
-    #history = model.fit(train_data, train_label,
-    #                    epochs=5, batch_size=256, validation_split=0.2)
     #exit(0)

@@ -2,9 +2,8 @@
 timit/
 .idea/
 playgrounds/dataset
-preprocessed_dataset/
-preprocessed_dataset_LMFE/
-
+preprocessed_dataset*
+.timit
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

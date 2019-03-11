@@ -5,24 +5,30 @@ from itertools import groupby
 from operator import itemgetter
 
 
+
+
 class MyDataGenerator:
 
     def __init__(self, path):
         self.__path = path
 
-    def generate_data(self):
+    def generate_data(self, phoneme_list=None, max_phn = 0):
         L0 = []
         L1 = []
         L2 = []
         label = np.empty(0)
         for file_name in glob.iglob(self.__path):
-            file_name = file_name.replace('preprocessed_dataset', 'preprocessed_dataset_LMFE')
+            file_name = file_name.replace('preprocessed_dataset', 'preprocessed_dataset_LMFE_CNN')
             file0 = pd.read_csv(file_name.replace('.csv', '-0.csv'))
             file1 = pd.read_csv(file_name.replace('.csv', '-1.csv'))
             file2 = pd.read_csv(file_name.replace('.csv', '-2.csv'))
             file1 = file1.rename(columns={'Unnamed: 0': 'frame'})  # optional
             file0 = file0.rename(columns={'Unnamed: 0': 'frame'})  # optional
             file2 = file2.rename(columns={'Unnamed: 0': 'frame'})  # optional
+            if phoneme_list is not None:
+                file0 = file0.loc[file0['phoneme'].isin(phoneme_list)]
+                file1 = file1.loc[file1['phoneme'].isin(phoneme_list)]
+                file2 = file2.loc[file2['phoneme'].isin(phoneme_list)]
             g0 = file0['phoneme'].ne(file0['phoneme'].shift()).cumsum()
             g1 = file1['phoneme'].ne(file1['phoneme'].shift()).cumsum()
             g2 = file2['phoneme'].ne(file2['phoneme'].shift()).cumsum()
@@ -33,6 +39,8 @@ class MyDataGenerator:
             unique = list(map(itemgetter(0), groupby(temp_label)))
             label = np.concatenate((label, unique))
         max_l = len(max(L0, key=len))
+        if max_l < max_phn:
+            max_l = max_phn
         data = np.empty((len(L0), 3, max_l, 40))
         for i in range(0, len(L0)):
             static = L0[i].iloc[:, 1:41].to_numpy()
