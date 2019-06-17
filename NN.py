@@ -10,21 +10,42 @@ import matplotlib.pyplot as plt
 from operator import itemgetter
 from sys import exit
 from DataGenerator import MyDataGenerator
+from matplotlib.font_manager import FontProperties
 
 def CNN_SPR():
     model = models.Sequential()
     model.add(
-        layers.Conv2D(150, kernel_size=3, activation='relu', input_shape=(3, 37, 40))
+        layers.Conv2D(128, (3,3), activation='relu', padding='same', input_shape=(3, 37, 40))
     )
     model.add(
         layers.MaxPool2D((2,2), strides=(2,2), data_format='channels_first')
     )
-    model.add(layers.Flatten())
+    model.add(
+        layers.Conv2D(128, (3, 3), activation='relu')
+    )
+    model.add(
+        layers.MaxPool2D((2,2), strides=(2,2), data_format='channels_first')
+    )
+    model.add(
+        layers.Conv2D(128, (3, 3), padding='same', activation='relu')
+    )
+    model.add(
+        layers.MaxPool2D((2,2), strides=(2,2), data_format='channels_first')
+    )
+    model.add(
+        layers.Flatten()
+    )
     model.add(
         layers.Dense(1050, activation='relu')
     )
     model.add(
-        layers.Dense(3, activation='softmax')
+        layers.Dropout(0.2)
+    )
+    model.add(
+        layers.Dense(512, activation='relu')
+    )
+    model.add(
+        layers.Dense(3, activation='sigmoid')
     )
     model.compile(
         loss='categorical_crossentropy',
@@ -33,11 +54,22 @@ def CNN_SPR():
     )
     return model
 
-def plot_value(epochs, history):
-    plt.figure()
+def plot_value(epochs, history, ev):
+    fig, ax = plt.subplots()
+    #plt.figure()
     plt.plot(range(0, epochs), history.history['val_loss'], 'r', label = "val loss")
     plt.plot(range(0, epochs), history.history['val_acc'], 'b', label="val acc")
-    plt.legend()
+    plt.plot(range(0, epochs), history.history['loss'], 'g', label = "loss")
+    plt.plot(range(0, epochs), history.history['acc'], 'm', label="acc")
+    plt.plot(epochs - 1, ev[0], 'go', label='loss test')
+    plt.plot(epochs - 1, ev[1], 'mo', label='acc test')
+    ax.annotate('%.4f' % (ev[0]), xy=(epochs - 2, ev[0] + 0.015) )
+    ax.annotate('%.4f' % (ev[1]), xy=(epochs - 2, ev[1] + 0.015) )
+    ax.annotate('%.4f' % (history.history['acc'][epochs - 1]),
+                xy=(epochs - 2, history.history['acc'][epochs - 1] + 0.015))
+    ax.annotate('%.4f' % (history.history['loss'][epochs - 1]),
+                xy=(epochs - 2, history.history['loss'][epochs - 1] + 0.015))
+    plt.legend(loc = 9, bbox_to_anchor=(0.5, -0.1), ncol=3)
     plt.show()
 
 
@@ -53,6 +85,7 @@ def normalize_and_scale_data(data):
     return data
 
 if __name__ == '__main__':
+    EPOCHS = 20
     model = CNN_SPR()
     print(model.summary())
     d_train = MyDataGenerator('./preprocessed_dataset/train/**/*/**.csv')
@@ -63,7 +96,8 @@ if __name__ == '__main__':
     test_label = encode_label(test_label)
 
     history = model.fit(train_data, train_label,
-                        epochs=20, batch_size=128, validation_split=0.2)
-    print(model.evaluate(test_data, test_label))
-
+                        epochs=EPOCHS, batch_size=128, validation_split=0.2)
+    evaluation = model.evaluate(test_data, test_label)
+    print(evaluation)
+    plot_value(EPOCHS, history, evaluation)
     #exit(0)
