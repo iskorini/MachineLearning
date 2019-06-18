@@ -12,7 +12,7 @@ class MyDataGenerator:
     def __init__(self, path):
         self.__path = path
 
-    def generate_data(self, phoneme_list=None, max_phn = 0):
+    def generate_data(self, phoneme_list=None, max_phn=0):
         L0 = []
         L1 = []
         L2 = []
