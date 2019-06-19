@@ -1,10 +1,13 @@
 #
+NP_Arrays/
+models/
+sub_dataset/
 timit/
 .idea/
 playgrounds/dataset
 preprocessed_dataset/
 preprocessed_dataset_LMFE/
-
+preprocessed_dataset_LMFE_CNN/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
