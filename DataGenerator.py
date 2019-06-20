@@ -10,15 +10,14 @@ class MyDataGenerator:
 
     def generate_data(self, phoneme_list=None):
         label = np.empty(0)
-        data = np.empty((0,120))
+        data = np.empty((0, 120))
         for file_name in glob.iglob(self.__path):
-            file = pd.read_csv(file_name).rename(columns={'Unnamed: 0': 'frame'})
+            data_file = pd.read_csv(file_name)
             if phoneme_list is not None:
-                file = file.loc[file['phoneme'].isin(phoneme_list)]
-            label = np.concatenate((label, np.array(file.iloc[:, -1])))
-            data = np.concatenate((data, np.array(file.iloc[:, 1:121])))
+                data_file = data_file.loc[data_file['phoneme'].isin(phoneme_list)]
+            data = np.concatenate((data,(data_file.iloc[:, 1:121]).to_numpy()))
+            label = np.concatenate(label, data_file['phoneme'].to_numpy())
         return data, label
-
 
 
 

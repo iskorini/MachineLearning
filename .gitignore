@@ -3,7 +3,9 @@ NP_Arrays/
 models/
 sub_dataset/
 timit/
+.vscode/
 .idea/
+timit.zip
 playgrounds/dataset
 preprocessed_dataset/
 preprocessed_dataset_LMFE/
