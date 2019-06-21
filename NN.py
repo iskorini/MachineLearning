@@ -1,23 +1,18 @@
 from keras import layers, models
-from keras.utils.np_utils import to_categorical
-from keras.utils import normalize
-from sklearn.preprocessing import LabelEncoder
-import glob
-import pandas as pd
-import numpy as np
-from itertools import groupby
 import matplotlib.pyplot as plt
-from operator import itemgetter
-from sys import exit
-from DataGenerator import MyDataGenerator
+import numpy as np
 
-def SimpleModel():
+
+def RNN_model(params):
     model = models.Sequential()
     model.add(
-        layers.Dense(120 ,input_shape=(120,), activation='relu')
+        layers.Dense(params['layer_size1'], input_shape=(120,), activation='relu')
     )
     model.add(
-        layers.Dense(120, activation='relu')
+        layers.Dropout(0.2)
+    )
+    model.add(
+        layers.Dense(params['layer_size1'], activation ='relu')
     )
     model.add(
         layers.Dense(3, activation='sigmoid')
@@ -28,6 +23,7 @@ def SimpleModel():
         metrics=['acc']
     )
     return model
+
 
 def plot_value(ep, history, ev):
     fig, ax = plt.subplots()
@@ -47,18 +43,29 @@ def plot_value(ep, history, ev):
     plt.show()
 
 
+def train_nn(train_d, train_l, ep, params):
+    m = RNN_model(params)
+    print(m.summary())
+    history = m.fit(train_d, train_l, epochs=ep, batch_size=int(params['batch_size']), validation_split=0.2)
+    return m, history
+
+
+def eval_nn(model, test_d, test_l):
+    return model.evaluate(test_d, test_l)
+
+
 if __name__ == '__main__':
-    phoneme_list = ['p', 't', 'k']
-    d = MyDataGenerator('./preprocessed_dataset_LMFE/train/**/**/**.csv')
-    train_data, train_label = d.generate_data(phoneme_list)
-    d = MyDataGenerator('./preprocessed_dataset_LMFE/test/**/**/**.csv')
-    test_data, test_label = d.generate_data(phoneme_list)
-    train_label = encode_label(train_label)
-    test_label = encode_label(test_label)
-    #train_data = normalize_and_scale_data(train_data)
-    #test_data = normalize_and_scale_data(test_data)
-    #model = SimpleModel()
-    #print(model.summary())
-    #history = model.fit(train_data, train_label, epochs=20, batch_size=64, validation_split=0.3)
-    #print(model.evaluate(test_data, test_label))
-    #exit(0)
+    test_data = np.load("./NP_Arrays/RNN/test_dataPTK.npy")
+    test_label = np.load("./NP_Arrays/RNN/test_labelPTK.npy")
+    train_data = np.load("./NP_Arrays/RNN/train_dataPTK.npy")
+    train_label = np.load("./NP_Arrays/RNN/train_labelPTK.npy")
+    epochs = 100
+    params = {
+        'batch_size': 4,
+        'layer_size1': 1000,
+        'layer_size2': 120
+    }
+    fit_result = train_nn(train_data, train_label, epochs, params)
+    test_result = eval_nn(fit_result[0], test_data, test_label)
+    plot_value(epochs, fit_result[1], test_result)
+    exit(0)
