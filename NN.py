@@ -29,12 +29,23 @@ def SimpleModel():
     )
     return model
 
-def plot_value(epochs, history):
-    plt.figure()
-    plt.plot(range(0, epochs), history.history['val_loss'], 'bo', label = "val loss")
-    plt.plot(range(0, epochs), history.history['val_acc'], 'b', label="val acc")
-    plt.legend()
+def plot_value(ep, history, ev):
+    fig, ax = plt.subplots()
+    plt.plot(range(0, ep), history.history['val_loss'], 'r', label="val loss")
+    plt.plot(range(0, ep), history.history['val_acc'], 'b', label="val acc")
+    plt.plot(range(0, ep), history.history['loss'], 'g', label="loss")
+    plt.plot(range(0, ep), history.history['acc'], 'm', label="acc")
+    plt.plot(ep - 1, ev[0], 'go', label='loss test')
+    plt.plot(ep - 1, ev[1], 'mo', label='acc test')
+    ax.annotate('%.4f' % (ev[0]), xy=(ep - 2, ev[0] + 0.015))
+    ax.annotate('%.4f' % (ev[1]), xy=(ep - 2, ev[1] + 0.015))
+    ax.annotate('%.4f' % (history.history['acc'][ep - 1]),
+                xy=(ep - 2, history.history['acc'][ep - 1] + 0.015))
+    ax.annotate('%.4f' % (history.history['loss'][ep - 1]),
+                xy=(ep - 2, history.history['loss'][ep - 1] + 0.015))
+    plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1), ncol=3)
     plt.show()
+
 
 
 def encode_label(label):
