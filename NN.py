@@ -6,13 +6,7 @@ import numpy as np
 def RNN_model(params):
     model = models.Sequential()
     model.add(
-        layers.Dense(params['layer_size1'], input_shape=(120,), activation='relu')
-    )
-    model.add(
-        layers.Dropout(0.2)
-    )
-    model.add(
-        layers.Dense(params['layer_size1'], activation ='relu')
+        layers.LSTM(32, input_shape=(1, 120))
     )
     model.add(
         layers.Dense(3, activation='sigmoid')
@@ -59,6 +53,8 @@ if __name__ == '__main__':
     test_label = np.load("./NP_Arrays/RNN/test_labelPTK.npy")
     train_data = np.load("./NP_Arrays/RNN/train_dataPTK.npy")
     train_label = np.load("./NP_Arrays/RNN/train_labelPTK.npy")
+    test_data = test_data.reshape((test_data.shape[0], 1, 120))
+    train_data = train_data.reshape((train_data.shape[0], 1, 120))
     epochs = 100
     params = {
         'batch_size': 4,
