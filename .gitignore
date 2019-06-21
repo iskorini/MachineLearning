@@ -6,6 +6,8 @@ timit/
 .vscode/
 .idea/
 timit.zip
+preprocessed_dataset.zip
+sub_dataset/
 playgrounds/dataset
 preprocessed_dataset/
 preprocessed_dataset_LMFE/

@@ -47,27 +47,18 @@ def plot_value(ep, history, ev):
     plt.show()
 
 
-
-def encode_label(label):
-    encoder = LabelEncoder()
-    encoder.fit(label.astype(str))
-    train_encoded_labels = encoder.transform(label)
-    return to_categorical(train_encoded_labels)
-
-
 if __name__ == '__main__':
     phoneme_list = ['p', 't', 'k']
     d = MyDataGenerator('./preprocessed_dataset_LMFE/train/**/**/**.csv')
     train_data, train_label = d.generate_data(phoneme_list)
     d = MyDataGenerator('./preprocessed_dataset_LMFE/test/**/**/**.csv')
     test_data, test_label = d.generate_data(phoneme_list)
-
     train_label = encode_label(train_label)
     test_label = encode_label(test_label)
-    train_data = normalize(train_data, axis=1, order=2)
-    test_data = normalize(test_data, axis=1, order=2)
-    model = SimpleModel()
-    print(model.summary())
-    history = model.fit(train_data, train_label, epochs=20, batch_size=64, validation_split=0.3)
-    print(model.evaluate(test_data, test_label))
+    #train_data = normalize_and_scale_data(train_data)
+    #test_data = normalize_and_scale_data(test_data)
+    #model = SimpleModel()
+    #print(model.summary())
+    #history = model.fit(train_data, train_label, epochs=20, batch_size=64, validation_split=0.3)
+    #print(model.evaluate(test_data, test_label))
     #exit(0)

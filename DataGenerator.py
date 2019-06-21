@@ -16,7 +16,7 @@ class MyDataGenerator:
             if phoneme_list is not None:
                 data_file = data_file.loc[data_file['phoneme'].isin(phoneme_list)]
             data = np.concatenate((data,(data_file.iloc[:, 1:121]).to_numpy()))
-            label = np.concatenate(label, data_file['phoneme'].to_numpy())
+            label = np.concatenate((label, data_file['phoneme'].to_numpy()))
         return data, label
 
 
