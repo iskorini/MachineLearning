@@ -1,6 +1,8 @@
 #
 NP_Arrays/
 timit/
+timit.zip
+models/
 .idea/
 playgrounds/dataset
 preprocessed_dataset*

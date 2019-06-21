@@ -151,7 +151,7 @@ if __name__ == '__main__':
     train_data = np.load("./NP_Arrays/train_data_ptk.arr.npy")
     train_label = np.load("./NP_Arrays/train_label_ptk.arr.npy")
     # train
-    epochs = 40
+    epochs = 100
     opt_search_space = hp.choice('name',
                                  [
                                      {'name': 'adam',
@@ -172,20 +172,23 @@ if __name__ == '__main__':
         'layer_size2': hp.quniform('layer_size2', low=250, high=1000, q=100),
         'batch_size': scope.power_of_two(hp.quniform('batch_size', 0, 8, q=1))
     }
-    trials = Trials()
-    best = fmin(opt_nn, hp_space_params, algo=tpe.suggest, max_evals=50, trials=trials)
-    space_eval = space_eval(hp_space_params, best)
-    pickle.dump(trials, open("trials.p", "wb"))
-    print(space_eval)
+    #trials = Trials()
+    #best = fmin(opt_nn, hp_space_params, algo=tpe.suggest, max_evals=50, trials=trials)
+    #space_eval = space_eval(hp_space_params, best)
+    #pickle.dump(trials, open("trials.p", "wb"))
+    #print(space_eval)
 
-    # params = {
-    #    'optimizer': {
-    #        'name':'adam',
-    #        'learning_rate':0.0003767227050266288},
-    #    'layer_size': 39,
-    #    'batch_size': 16
-    # }
-    # fit_result = train_nn(train_data, train_label, epochs, params)
-    # test_result = eval_nn(fit_result[0], test_data, test_label)
-    # plot_value(epochs, fit_result[1], test_result)
-    # exit(0)
+    params = {
+        'optimizer': {
+            'name':'adam',
+            'learning_rate': 0.00015221574430693675},
+        'dropout_variation1': 0.3,
+        'dropout_variation2': 0.2,
+        'layer_size1': 800,
+        'layer_size2': 1000,
+        'batch_size': 4
+    }
+    fit_result = train_nn(train_data, train_label, epochs, params)
+    test_result = eval_nn(fit_result[0], test_data, test_label)
+    plot_value(epochs, fit_result[1], test_result)
+    exit(0)
