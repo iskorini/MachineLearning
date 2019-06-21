@@ -18,18 +18,26 @@ def min_max_scale_skl(data):
     return scaler.transform(data)
 
 
+def min_max_scaler_skl_3d(data):
+    for i in range(0,data.shape[1]):
+        scaler = MinMaxScaler()
+        scaler = scaler.fit(data[:, i, :])
+        data[:, i, :] = scaler.transform(data[:, i, :])
+    return data
+
+
 if __name__ == '__main__':
     phoneme_list = ['p', 't', 'k']
     d = MyDataGenerator('./preprocessed_dataset_LMFE/train/**/**/**.csv')
-    train_data, train_label = d.generate_data(phoneme_list)
+    train_data, train_label = d.generate_overlapping_chunks(10, phoneme_list)
     d = MyDataGenerator('./preprocessed_dataset_LMFE/test/**/**/**.csv')
-    test_data, test_label = d.generate_data(phoneme_list)
+    test_data, test_label = d.generate_overlapping_chunks(10, phoneme_list)
     train_label = encode_label(train_label)
     test_label = encode_label(test_label)
-    train_data = min_max_scale_skl(train_data)
-    test_data = min_max_scale_skl(test_data)
-    np.save('./NP_Arrays/RNN/train_dataPTK', train_data)
-    np.save('./NP_Arrays/RNN/test_dataPTK', test_data)
-    np.save('./NP_Arrays/RNN/train_labelPTK', train_label)
-    np.save('./NP_Arrays/RNN/test_labelPTK', test_label)
-    exit(0)
+    train_data = min_max_scaler_skl_3d(train_data)
+    test_data = min_max_scaler_skl_3d(test_data)
+    np.save('./NP_Arrays/RNN/train_dataPTK_10', train_data)
+    np.save('./NP_Arrays/RNN/test_dataPTK_10', test_data)
+    np.save('./NP_Arrays/RNN/train_labelPTK_10', train_label)
+    np.save('./NP_Arrays/RNN/test_labelPTK_10', test_label)
+    #exit(0)

@@ -1,3 +1,4 @@
+import os
 from keras import layers, models
 import matplotlib.pyplot as plt
 import numpy as np
@@ -6,7 +7,7 @@ import numpy as np
 def RNN_model(params):
     model = models.Sequential()
     model.add(
-        layers.LSTM(32, input_shape=(1, 120))
+        layers.Bidirectional(layers.LSTM(params['LSTM_SIZE']), input_shape=(10, 120))
     )
     model.add(
         layers.Dense(3, activation='sigmoid')
@@ -35,6 +36,7 @@ def plot_value(ep, history, ev):
                 xy=(ep - 2, history.history['loss'][ep - 1] + 0.015))
     plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1), ncol=3)
     plt.show()
+    plt.savefig('./plots/'+str(len(os.listdir('./plots')) + 1)+'.png')
 
 
 def train_nn(train_d, train_l, ep, params):
@@ -49,19 +51,17 @@ def eval_nn(model, test_d, test_l):
 
 
 if __name__ == '__main__':
-    test_data = np.load("./NP_Arrays/RNN/test_dataPTK.npy")
-    test_label = np.load("./NP_Arrays/RNN/test_labelPTK.npy")
-    train_data = np.load("./NP_Arrays/RNN/train_dataPTK.npy")
-    train_label = np.load("./NP_Arrays/RNN/train_labelPTK.npy")
-    test_data = test_data.reshape((test_data.shape[0], 1, 120))
-    train_data = train_data.reshape((train_data.shape[0], 1, 120))
-    epochs = 100
+    test_data = np.load('./NP_Arrays/RNN/test_dataPTK_10.npy')
+    test_label = np.load('./NP_Arrays/RNN/test_labelPTK_10.npy')
+    train_data = np.load('./NP_Arrays/RNN/train_dataPTK_10.npy')
+    train_label = np.load('./NP_Arrays/RNN/train_labelPTK_10.npy')
     params = {
+        'epochs': 100,
         'batch_size': 4,
-        'layer_size1': 1000,
+        'LSTM_SIZE': 32,
         'layer_size2': 120
     }
-    fit_result = train_nn(train_data, train_label, epochs, params)
+    fit_result = train_nn(train_data, train_label, params['epochs'], params)
     test_result = eval_nn(fit_result[0], test_data, test_label)
-    plot_value(epochs, fit_result[1], test_result)
+    plot_value(params['epochs'], fit_result[1], test_result)
     exit(0)
