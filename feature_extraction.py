@@ -27,9 +27,9 @@ def create_file_of_feature(path):
         Path(feature_name[:''.join(feature_name).rindex('/')]).mkdir(parents=True, exist_ok=True)
         print(file_name, " -> ", feature_name)
         extracted_feature = extract_feature_from_wav(file_name)
-        feature = pd.DataFrame(np.concatenate((extracted_feature[:,:,0],
-                                            extracted_feature[:,:,1],
-                                            extracted_feature[:,:,2]), axis=1))
+        feature = pd.DataFrame(np.concatenate((extracted_feature[:, :, 0],
+                                            extracted_feature[:, :, 1],
+                                            extracted_feature[:, :, 2]), axis=1))
         feature.rename(index=str, columns={'Unnamed: 0': 'frame'})
         feature['start_frame'] = np.arange(len(feature))
         feature['start_frame'] = feature['start_frame'] * FRAME_STRIDE * 1000

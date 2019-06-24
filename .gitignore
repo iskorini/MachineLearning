@@ -1,4 +1,7 @@
 #
+logs/
+plots/
+test_file/
 NP_Arrays/
 models/
 sub_dataset/
