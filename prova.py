@@ -11,17 +11,15 @@ import datetime
 import progressbar
 import itertools
 from multiprocessing.pool import Pool as ThreadPool
+
 test = '/home/fs6185896/ML_PROJECT/MachineLearning/preprocessed_dataset_LIBROSA/test/dr1/faks0/sa1.csv'
-
-
 class MyDataGenerator:
-
+    
     def __init__(self, path):
         self.__path = path
         self.__path_train = path[0]
         self.__path_test = path[1]
         self.__path_validation = path[2]
-
 
     def generate_overlapping_chunks_LIBROSA(self, timesteps, compact = True):
         args = [self.__path_train, self.__path_test, self.__path_validation]
@@ -37,13 +35,28 @@ class MyDataGenerator:
             data_test = self.compact_class(data_test)
             data_validation = self.compact_class(data_validation)
         train_n, test_n, validation_n = self.min_max_scale_skl(data_train, data_test, data_validation)
-        train_data = self.generate_chunks(data_train, train_n, timesteps )
-        test_data = self.generate_chunks(data_test, test_n, timesteps )
-        validation_data = self.generate_chunks(data_validation, validation_n, timesteps )
-        return train_data[0], train_data[1], test_data[0], test_data[1], validation_data[0], validation_data[1]
+        dim = int(train_n.shape[0]/6)
+        #train
+        args1 = [data_train.iloc[0:dim,:], data_train.iloc[dim:dim*2,:], data_train.iloc[(dim*2):dim*3,:]
+        , data_train.iloc[(dim*3):dim*4,:], data_train.iloc[(dim*4):dim*5,:], data_train.iloc[(dim*5):-1,:],
+         data_test.iloc[0:dim,:], data_test.iloc[dim:-1,:], data_validation.iloc[0:dim,:], data_validation.iloc[dim:-1,:]]
+        args2 = [train_n[0:dim], train_n[dim:dim*2], train_n[(dim*2):dim*3], train_n[(dim*3):dim*4], train_n[(dim*4):dim*5]
+        , train_n[(dim*5):-1], test_n[0:dim] , test_n[dim:-1,:], validation_n[0:dim,:], validation_n[dim:-1,:]]
+        pool = ThreadPool(8)
+        results = pool.starmap(self.generate_chunks, zip(args1, args2, itertools.repeat(timesteps)))
+        pool.close()
+        pool.join()
+
+        train_data_set = np.concatenate((results[0][0], results[1][0], results[2][0], results[3][0], results[4][0], results[5][0]))
+        test_data_set = np.concatenate((results[6][0], results[7][0]))
+        validation_data_set = np.concatenate((results[8][0], results[9][0]))
+
+        train_label = np.concatenate((results[0][1], results[1][1], results[2][1], results[3][1], results[4][1], results[5][1]))
+        test_label = np.concatenate((results[6][1], results[7][1]))
+        validation_label = np.concatenate((results[8][1], results[9][1]))
+        train_label, test_label, validation_label = self.encode_label(train_label, test_label, validation_label)
+        return train_data_set, train_label, test_data_set,test_label , validation_data_set , validation_label
         
-
-
     def compact_class(self, data_file):
         data_file.loc[data_file['phoneme'] == 'ux', 'phoneme'] = 'uw'
         data_file.loc[data_file['phoneme'] == 'axr', 'phoneme'] = 'er'
@@ -97,7 +110,7 @@ class MyDataGenerator:
         bar = progressbar.ProgressBar(maxval=data.shape[0]-timesteps, widgets=[progressbar.Bar('=', '[', ']'), ' ', progressbar.Percentage()])
         bar.start()
         for i in range(0, data.shape[0]-timesteps+1):
-            data_np.append(data_norm[i:b[i]].reshape(1, timesteps, (124 - 1)))
+            data_np.append(data_norm[i:b[i]].reshape(1, (124 - 1)*3))
             label.append(data.iloc[i + floor(timesteps / 2)]['phoneme'])
             bar.update(i)
         data_np = np.concatenate(data_np)
@@ -124,7 +137,7 @@ if __name__ == "__main__":
     path = ['./preprocessed_dataset_LIBROSA/train2/**/**/**.csv', './preprocessed_dataset_LIBROSA/test/**/**/**.csv',
     './preprocessed_dataset_LIBROSA/validation/**/**/**.csv']
     d = MyDataGenerator(path)
-    train_data, train_label, test_data, test_label, validation_data, validation_label = d.generate_overlapping_chunks_LIBROSA(11q)
+    train_data, train_label, test_data, test_label, validation_data, validation_label = d.generate_overlapping_chunks_LIBROSA(3)
     np.save('./NP_Arrays/RNN/LIBROSA/train_data', train_data)
     np.save('./NP_Arrays/RNN/LIBROSA/test_data', test_data)
     np.save('./NP_Arrays/RNN/LIBROSA/train_label', train_label)
@@ -134,5 +147,3 @@ if __name__ == "__main__":
     now = datetime.datetime.now()
     print(str(now.hour) + " " + str(now.minute))
     print("--- %s seconds ---" % (time.time() - start_time))
-
-
