@@ -16,6 +16,7 @@ preprocessed_dataset/
 preprocessed_dataset_LMFE/
 preprocessed_dataset_LMFE_CNN/
 .DS_Store
+preprocessed_dataset_MFCC/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

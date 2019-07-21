@@ -14,14 +14,14 @@ NUM_CEPSTRAL = 12
 
 def extract_feature_from_wav(path):
     (rate, sig) = wav.read(path)
-    log_energy = sphp.feature.lmfe(sig, sampling_frequency=16000, frame_length=FRAME_LENGTH,
+    log_energy = sphp.feature.mfcc(sig, sampling_frequency=16000, frame_length=FRAME_LENGTH,
                                frame_stride=FRAME_STRIDE, num_filters=NUM_FILTERS)
     return sphp.feature.extract_derivative_feature(log_energy)
 
 
 def create_file_of_feature(path):
     for file_name in glob.iglob(path):
-        feature_name = file_name.replace('timit', 'preprocessed_dataset_LMFE')
+        feature_name = file_name.replace('timit', 'preprocessed_dataset_MFCC')
         feature_name = feature_name.replace('.wav', '.csv')
         feature_name = feature_name.replace('CONVERTED', '')
         Path(feature_name[:''.join(feature_name).rindex('/')]).mkdir(parents=True, exist_ok=True)
