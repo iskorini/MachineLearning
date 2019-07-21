@@ -15,6 +15,7 @@ playgrounds/dataset
 preprocessed_dataset/
 preprocessed_dataset_LMFE/
 preprocessed_dataset_LMFE_CNN/
+.DS_Store
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
