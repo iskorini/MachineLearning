@@ -8,6 +8,7 @@ sub_dataset/
 timit/
 .vscode/
 .idea/
+*.out
 timit.zip
 preprocessed_dataset.zip
 sub_dataset/
@@ -15,8 +16,8 @@ playgrounds/dataset
 preprocessed_dataset/
 preprocessed_dataset_LMFE/
 preprocessed_dataset_LMFE_CNN/
-.DS_Store
-preprocessed_dataset_MFCC/
+telegram_bot_callback.py
+dl_bot.py
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -133,3 +134,4 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+telegram_bot_callback.py

@@ -1,35 +1,42 @@
 import numpy as np
 import glob
-import speechpy as sphp
-import scipy.io.wavfile as wav
 from sys import exit
 from pathlib import Path
 import pandas as pd
+import librosa
+import os
 
+#FOR PYTHON2
 NUM_FILTERS = 40
 FRAME_STRIDE = 0.01 #seconds
 FRAME_LENGTH = 0.025 #seconds
-NUM_CEPSTRAL = 12
 
 
+# https://groups.google.com/forum/#!topic/librosa/V4Z1HpTKn8Q prima o poi lo capiro'
 def extract_feature_from_wav(path):
-    (rate, sig) = wav.read(path)
-    log_energy = sphp.feature.mfcc(sig, sampling_frequency=16000, frame_length=FRAME_LENGTH,
-                               frame_stride=FRAME_STRIDE, num_filters=NUM_FILTERS)
-    return sphp.feature.extract_derivative_feature(log_energy)
+    y, sr = librosa.load(path, sr=16000)
+    mfcc = librosa.feature.mfcc(y,sr, n_mfcc=40, hop_length=int(sr*FRAME_STRIDE), n_fft=int(sr*FRAME_LENGTH))
+    mfcc_delta = librosa.feature.delta(mfcc, order = 1)
+    mfcc_delta_delta = librosa.feature.delta(mfcc, order = 2)
+    energy  = librosa.feature.rmse(y, frame_length=int(sr*FRAME_LENGTH), hop_length=int(sr*FRAME_STRIDE))
+    energy_delta = librosa.feature.delta(energy)
+    energy_delta_delta = librosa.feature.delta(energy)
+    return np.concatenate((mfcc, energy)), np.concatenate((mfcc_delta, energy_delta)), np.concatenate((mfcc_delta_delta, energy_delta_delta))
 
 
 def create_file_of_feature(path):
     for file_name in glob.iglob(path):
-        feature_name = file_name.replace('timit', 'preprocessed_dataset_MFCC')
+        feature_name = file_name.replace('timit', 'preprocessed_dataset_ESSENTIA')
         feature_name = feature_name.replace('.wav', '.csv')
         feature_name = feature_name.replace('CONVERTED', '')
-        Path(feature_name[:''.join(feature_name).rindex('/')]).mkdir(parents=True, exist_ok=True)
+        pth = Path(feature_name[:''.join(feature_name).rindex('/')])
+        if not os.path.exists(str(pth)):
+            pth.mkdir(parents=True)
         print(file_name, " -> ", feature_name)
         extracted_feature = extract_feature_from_wav(file_name)
-        feature = pd.DataFrame(np.concatenate((extracted_feature[:, :, 0],
-                                            extracted_feature[:, :, 1],
-                                            extracted_feature[:, :, 2]), axis=1))
+        feature = pd.DataFrame(np.concatenate((extracted_feature[0],
+                                            extracted_feature[1],
+                                            extracted_feature[2])))
         feature.rename(index=str, columns={'Unnamed: 0': 'frame'})
         feature['start_frame'] = np.arange(len(feature))
         feature['start_frame'] = feature['start_frame'] * FRAME_STRIDE * 1000

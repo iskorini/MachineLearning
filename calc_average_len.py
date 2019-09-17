@@ -2,7 +2,7 @@ import glob
 import numpy as np 
 import pandas as pd 
 import progressbar
-from statistics import mean
+from statistics import mean, stdev
 from multiprocessing.pool import Pool as ThreadPool
 
 
@@ -33,5 +33,12 @@ if __name__ == "__main__":
     avg = ((len(data_train)*data_train_mean) + (len(data_validation)*data_validation_mean))/(len(data_train)+len(data_validation))
     print("Average sentences length:")
     print(avg)
-
+    print("STDev train:")
+    print(stdev(map(lambda x: len(x), data_train)))
+    print("STDev validation:")
+    print(stdev(map(lambda x: len(x), data_validation)))
+    print("Maximum sentences lenght:")
+    print(max(max(map(lambda x: len(x), data_train)), max(map(lambda x: len(x), data_validation)) ))
+    print("Minimum sentences lenght:")
+    print(min(min(map(lambda x: len(x), data_train)), min(map(lambda x: len(x), data_validation)) ))
     
