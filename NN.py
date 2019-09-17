@@ -205,7 +205,7 @@ def train_nn(train_d, train_l, val,  ep, params, tboard=False, multi_gpu = False
             batch_size=int(params['batch_size']), write_images=True)
         callbacks.append(tensorboard)
     #######################################
-    telegram_token = "949198369:AAEpV0bl11PztAvfiNclPCFCqUfU4HvMndk"
+    telegram_token = "****"
     telegram_user_id = 25897312
     bot = DLBot(token=telegram_token, user_id=telegram_user_id)
     callbacks.append(TelegramBotCallback(bot))
